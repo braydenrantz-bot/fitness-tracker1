@@ -1,1 +1,92 @@
-{\n  \"name\": \"fitness-tracker1\",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"scripts\": {\n    \"dev\": \"vite\",\n    \"build\": \"vite build\",\n    \"serve\": \"vite preview\"\n  },\n  \"dependencies\": {\n    \"react\": \"^18.0.0\",\n    \"react-dom\": \"^18.0.0\"\n  },\n  \"devDependencies\": {\n    \"vite\": \"^4.0.0\"\n  }\n}
+import React, { useState, useEffect } from "react";
+
+export default function App() {
+  const [workouts, setWorkouts] = useState([]);
+  const [meals, setMeals] = useState([]);
+  const [workoutInput, setWorkoutInput] = useState("");
+  const [mealInput, setMealInput] = useState("");
+
+  useEffect(() => {
+    const savedWorkouts = localStorage.getItem("workouts");
+    const savedMeals = localStorage.getItem("meals");
+
+    if (savedWorkouts) setWorkouts(JSON.parse(savedWorkouts));
+    if (savedMeals) setMeals(JSON.parse(savedMeals));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("workouts", JSON.stringify(workouts));
+  }, [workouts]);
+
+  useEffect(() => {
+    localStorage.setItem("meals", JSON.stringify(meals));
+  }, [meals]);
+
+  const addWorkout = () => {
+    if (!workoutInput.trim()) return;
+    setWorkouts([workoutInput, ...workouts]);
+    setWorkoutInput("");
+  };
+
+  const addMeal = () => {
+    if (!mealInput.trim()) return;
+    setMeals([mealInput, ...meals]);
+    setMealInput("");
+  };
+
+  const deleteWorkout = (index) => {
+    setWorkouts(workouts.filter((_, i) => i !== index));
+  };
+
+  const deleteMeal = (index) => {
+    setMeals(meals.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+      <h1>Fitness Tracker 💪</h1>
+
+      <div style={{ display: "flex", gap: "40px", marginTop: "20px" }}>
+        {/* Workouts */}
+        <div>
+          <h2>Workouts</h2>
+          <input
+            placeholder="Chest day, run..."
+            value={workoutInput}
+            onChange={(e) => setWorkoutInput(e.target.value)}
+          />
+          <button onClick={addWorkout}>Add</button>
+
+          <ul>
+            {workouts.map((w, i) => (
+              <li key={i}>
+                {w}
+                <button onClick={() => deleteWorkout(i)}>❌</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Meals */}
+        <div>
+          <h2>Meals</h2>
+          <input
+            placeholder="Chicken, protein shake..."
+            value={mealInput}
+            onChange={(e) => setMealInput(e.target.value)}
+          />
+          <button onClick={addMeal}>Add</button>
+
+          <ul>
+            {meals.map((m, i) => (
+              <li key={i}>
+                {m}
+                <button onClick={() => deleteMeal(i)}>❌</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
