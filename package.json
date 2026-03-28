@@ -6,6 +6,7 @@ export default function App() {
   const [workoutInput, setWorkoutInput] = useState("");
   const [mealInput, setMealInput] = useState("");
 
+  // Load saved data from localStorage on first render
   useEffect(() => {
     const savedWorkouts = localStorage.getItem("workouts");
     const savedMeals = localStorage.getItem("meals");
@@ -14,23 +15,21 @@ export default function App() {
     if (savedMeals) setMeals(JSON.parse(savedMeals));
   }, []);
 
+  // Save data to localStorage whenever workouts or meals change
   useEffect(() => {
     localStorage.setItem("workouts", JSON.stringify(workouts));
-  }, [workouts]);
-
-  useEffect(() => {
     localStorage.setItem("meals", JSON.stringify(meals));
-  }, [meals]);
+  }, [workouts, meals]);
 
   const addWorkout = () => {
     if (!workoutInput.trim()) return;
-    setWorkouts([workoutInput, ...workouts]);
+    setWorkouts([{ name: workoutInput, time: new Date() }, ...workouts]);
     setWorkoutInput("");
   };
 
   const addMeal = () => {
     if (!mealInput.trim()) return;
-    setMeals([mealInput, ...meals]);
+    setMeals([{ name: mealInput, time: new Date() }, ...meals]);
     setMealInput("");
   };
 
@@ -54,14 +53,20 @@ export default function App() {
             placeholder="Chest day, run..."
             value={workoutInput}
             onChange={(e) => setWorkoutInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addWorkout()}
           />
           <button onClick={addWorkout}>Add</button>
 
           <ul>
             {workouts.map((w, i) => (
-              <li key={i}>
-                {w}
-                <button onClick={() => deleteWorkout(i)}>❌</button>
+              <li key={i} style={{ marginBottom: "5px" }}>
+                {w.name} ({new Date(w.time).toLocaleTimeString()})
+                <button
+                  style={{ marginLeft: "10px" }}
+                  onClick={() => deleteWorkout(i)}
+                >
+                  ❌
+                </button>
               </li>
             ))}
           </ul>
@@ -74,14 +79,20 @@ export default function App() {
             placeholder="Chicken, protein shake..."
             value={mealInput}
             onChange={(e) => setMealInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addMeal()}
           />
           <button onClick={addMeal}>Add</button>
 
           <ul>
             {meals.map((m, i) => (
-              <li key={i}>
-                {m}
-                <button onClick={() => deleteMeal(i)}>❌</button>
+              <li key={i} style={{ marginBottom: "5px" }}>
+                {m.name} ({new Date(m.time).toLocaleTimeString()})
+                <button
+                  style={{ marginLeft: "10px" }}
+                  onClick={() => deleteMeal(i)}
+                >
+                  ❌
+                </button>
               </li>
             ))}
           </ul>
